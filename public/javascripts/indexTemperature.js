@@ -146,9 +146,10 @@ function updateMyChart(time,value) {
 }
 
 //请求历史数据
+/*
 $.get('/history/'+equipmentId,function (data) {
     console.log("history:",data)
     // data.forEach(function (v) {
     //   updateMyChart(v.time,v.value)
     // })
-})
+})*/

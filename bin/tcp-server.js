@@ -3,7 +3,7 @@ const net = require('net')
 const PORT = "9003"
 const equipmentArray = []
 const TIMEOUT = 100 * 1000000; // 10秒没接收到数据就断开连接
-const mongodb = require('./mongodb.js')
+//const mongodb = require('./mongodb.js')
 const websocket = require('./websocket.js')
 const tcpClient = require('./tcp-client.js')
 
@@ -35,11 +35,11 @@ const server = net.createServer((socket) => {
             }
             else {
                 //保存所接收到的数据
-                mongodb.insert({id: socket.id, data: socket.lastValue}, function (err) {
+/*                mongodb.insert({id: socket.id, data: socket.lastValue}, function (err) {
                     if (err) {
                         console.log(socket.id, "保存数据失败：", err)
                     }
-                })
+                })*/
                 //发送websocket消息
                 websocket.sendData(socket.id, socket.lastValue)
                 //VR交互
@@ -84,9 +84,9 @@ server.on("error", (err) => {
 //开启监听
 server.listen({port: PORT, host: '0.0.0.0'}, () => {
     console.log('demo2 tcp server running on', server.address())
-//    setTimeout(() => {
-//		tcpClient.init()
-//    }, 4000);
+   // setTimeout(() => {
+	// 	tcpClient.init()
+   // }, 4000);
 })
 
 //VR设备控制
