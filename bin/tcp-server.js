@@ -5,13 +5,14 @@ const equipmentArray = []
 const TIMEOUT = 100 * 1000000; // 10秒没接收到数据就断开连接
 //const mongodb = require('./mongodb.js')
 const websocket = require('./websocket.js')
-const tcpClient = require('./tcp-client.js')
+//const tcpClient = require('./tcp-client.js')
 
 //initial Tcp server
 const server = net.createServer((socket) => {
     //connect
     let addr = socket.remoteAddress + ':' + socket.remotePort
     console.log(addr, " connected.")
+    console.log(socket.address().address)
     // receive data from Tcp client and arrange corresponding socket to the connected Tcp client.
     socket.on("data", data => {
 //        let dataArray = data.toString('ascii').split(",")
