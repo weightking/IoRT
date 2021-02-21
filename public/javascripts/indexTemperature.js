@@ -107,7 +107,7 @@ let option1 = {
     },
     yAxis: {
         type: 'value',
-         min: '25.0',
+         min: '18.0',
         // max: '45'
         // scale: 'true'
     },
@@ -146,10 +146,9 @@ function updateMyChart(time,value) {
 }
 
 //请求历史数据
-/*
 $.get('/history/'+equipmentId,function (data) {
     console.log("history:",data)
     // data.forEach(function (v) {
     //   updateMyChart(v.time,v.value)
     // })
-})*/
+})
