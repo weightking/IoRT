@@ -20,7 +20,7 @@ const server = net.createServer((socket) => {
         let dataArray = data.toString('ascii')
         let str = addr + " receive: " + dataArray
         socket.lastValue = dataArray
-        console.log("receive:"+dataArray)
+//        console.log("receive:"+dataArray)
 //		socket.write('0');
         // 接收的第一条数据为设备id
         if (!socket.id) {

@@ -29,6 +29,7 @@ let rosTopic = new ROSLIB.Topic({
 
 let client = new net.Socket();
 
+//client.connect(9004, '35.222.89.72', function () {
 client.connect(9004, '127.0.0.1', function () {
     console.log('tcp-client Connected.');
     // send IP address to Tcp server to arrange corresponding socket
