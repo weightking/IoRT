@@ -13,7 +13,6 @@ body(onload='init()')
     script(type="text/javascript", src="http://static.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js")
     script(type="text/javascript", src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js")
     script(type="text/javascript" src="http://static.robotwebtools.org/ros2djs/current/ros2d.min.js")
-    //script(type="text/javascript" src="http://static.robotwebtools.org/nav2djs/current/nav2d.min.js")
     script(type="text/javascript" src="http://static.robotwebtools.org/mjpegcanvasjs/current/mjpegcanvas.min.js")
     script(type="text/javascript")
 
@@ -25,7 +24,7 @@ body(onload='init()')
             .col-md-3.col-md-offset-1
                 h2.text-primary Navigation
             .col-md-3.col-md-offset-1
-                h2.text-primary Thermal Camera
+                h2.text-primary Camera View
         .row
             .col-md-4
                 <div class="clearfix" style="margin-bottom: 40px;"></div>
@@ -59,4 +58,7 @@ body(onload='init()')
             .col-md-4
                 <div class="clearfix" style="margin-bottom: 40px;"></div>
                 #nav
+            .col-md-4
+                <div class="clearfix" style="margin-bottom: 40px;"></div>
+                #mjpeg
         script(src="/javascripts/robotOperation.js")

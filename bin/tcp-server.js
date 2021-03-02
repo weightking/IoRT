@@ -10,6 +10,7 @@ const websocket = require('./websocket.js')
 //initial Tcp server
 const server = net.createServer((socket) => {
     //connect
+    let videoStream = ""
     let addr = socket.remoteAddress + ':' + socket.remotePort
     console.log(addr, " connected.")
     console.log(socket.address().address)
@@ -32,6 +33,15 @@ const server = net.createServer((socket) => {
                 // will not send the data if occurs Sticky
                 if (dataArray.indexOf("}{")==-1){
                     websocket.sendRobotData(socket.id, socket.lastValue)
+                }
+            }
+            else if (socket.id == "Robot1Video") {
+                if (dataArray.indexOf("}{")==-1){
+                    videoStream+=socket.lastValue
+                    if (videoStream.search("is_bigendian") != -1){
+                        websocket.sendRobotData(socket.id, videoStream)
+                        videoStream=""
+                    }
                 }
             }
             else {

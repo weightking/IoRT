@@ -145,7 +145,7 @@ function funcStop()
 //function defined for robot normal moveForward
 function funcNormalForward()
 {
-    twist.linear.x = 0.1;
+    twist.linear.x = 0.2;
     twist.linear.y = 0.0;
     twist.linear.z = 0.0;
     twist.angular.x = 0.0;
@@ -157,7 +157,7 @@ function funcNormalForward()
 //function defined for robot normal moveBack
 function funcNormalBack()
 {
-    twist.linear.x = -0.1;
+    twist.linear.x = -0.2;
     twist.linear.y = 0.0;
     twist.linear.z = 0.0;
     twist.angular.x = 0.0;
@@ -173,7 +173,7 @@ function funcNormalRight()
     twist.linear.z = 0.0;
     twist.angular.x = 0.0;
     twist.angular.y = 0.0;
-    twist.angular.z = -0.3;
+    twist.angular.z = -0.2;
     cmdVel.publish(twist);//发布twist消息
 }
 //function defined for robot turn Left
@@ -184,13 +184,13 @@ function funcNormalLeft()
     twist.linear.z = 0.0;
     twist.angular.x = 0.0;
     twist.angular.y = 0.0;
-    twist.angular.z = 0.3;
+    twist.angular.z = 0.2;
     cmdVel.publish(twist);//发布twist消息
 }
 //function defined for robot accelerate moveForward
 function funcAccForward()
 {
-    twist.linear.x = 1.0;
+    twist.linear.x = 0.4;
     twist.linear.y = 0.0;
     twist.linear.z = 0.0;
     twist.angular.x = 0.0;
@@ -201,7 +201,7 @@ function funcAccForward()
 //function defined for robot accelerate moveBack
 function funcAccBack()
 {
-    twist.linear.x = -1.0;
+    twist.linear.x = -0.4;
     twist.linear.y = 0.0;
     twist.linear.z = 0.0;
     twist.angular.x = 0.0;
@@ -217,7 +217,7 @@ function funcAccRight()
     twist.linear.z = 0.0;
     twist.angular.x = 0.0;
     twist.angular.y = 0.0;
-    twist.angular.z = -1.0;
+    twist.angular.z = -0.4;
     cmdVel.publish(twist);//发布twist消息
 }
 //function defined for robot accelerate turn Left
@@ -228,7 +228,7 @@ function funcAccLeft()
     twist.linear.z = 0.0;
     twist.angular.x = 0.0;
     twist.angular.y = 0.0;
-    twist.angular.z = 1.0;
+    twist.angular.z = 0.4;
     cmdVel.publish(twist);//发布twist消息
 }
 //function define message for robot goal

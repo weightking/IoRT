@@ -3,10 +3,12 @@ const host = window.location.host
 // get id from current web address
 let equipmentId = window.location.pathname.split("/")[2] || "123456"
 let equipmentRosTopic = equipmentId+"RosTopic"
+let equipmentVideo = equipmentId+"Video"
 
 // construct websocket connection
 const socket = new WebSocket('ws://'+host);
 const socket1 = new WebSocket('ws://'+host);
+const socket2 = new WebSocket('ws://'+host);
 
 // construct websocket connection
 socket.onopen=function () {
@@ -23,6 +25,13 @@ socket1.onopen=function () {
     socket1.send(data1)
 }
 
+socket2.onopen=function () {
+    console.log("websocket connect!")
+    let data1 = JSON.stringify({equipmentId:equipmentVideo})
+    //send Id to websocket server to arrange corresponding socket
+    socket2.send(data1)
+}
+
 function init() {
     let viewer = new ROS2D.Viewer({
         divID: 'nav',
@@ -37,6 +46,11 @@ function init() {
         rootObject: viewer.scene,
         viewer: viewer
     });
+    let viewer1 = new MJPEGCANVAS({
+        divID: 'mjpeg',
+        width: 400,
+        height: 400,
+    })
 }
 
 socket.onclose=function () {
@@ -104,8 +118,11 @@ function OccupancyGridClient(options) {
         } else {
             that.rootObject.addChild(that.currentGrid);
         }
-        that.viewer.scaleToDimensions(that.currentGrid.width, that.currentGrid.height);
-        that.viewer.shift(that.currentGrid.pose.position.x, that.currentGrid.pose.position.y);
+        //that.viewer.scaleToDimensions(that.currentGrid.width, that.currentGrid.height);
+        //that.viewer.shift(that.currentGrid.pose.position.x, that.currentGrid.pose.position.y);
+        //robot test from Chinese Academic department
+        that.viewer.scaleToDimensions(that.currentGrid.width*0.5, that.currentGrid.height*0.5);
+        that.viewer.shift(that.currentGrid.pose.position.x*0.5, that.currentGrid.pose.position.y*0.5);
     }
 };
 // function define to update the robot position
@@ -154,7 +171,7 @@ function Navigator(options) {
     let robotMarker = null;
 
     robotMarker = new ROS2D.NavigationArrow({
-        size: 25,
+        size: 15,
         strokeSize: 1,
         fillColor: createjs.Graphics.getRGB(255, 128, 0, 0.66),
         pulse: true
@@ -182,11 +199,12 @@ function Navigator(options) {
         let pose = JSON.parse(msg.data)
         updateRobotPosition(pose.position, pose.orientation);
         // judge the location of robot is same with the goal, remove the goal marker if merge
-        if (Math.abs(currentPose[0].position.x-pose.position.x)<0.18
-            &&Math.abs(currentPose[0].position.y-pose.position.y)<0.05
-            &&Math.abs(currentPose[0].orientation.w-pose.orientation.w)<0.0015)
+        if (Math.abs(currentPose[0].position.x-pose.position.x)<0.1
+            &&Math.abs(currentPose[0].position.y-pose.position.y)<0.1
+            &&Math.abs(currentPose[0].orientation.w-pose.orientation.w)<0.02)
         {
             that.rootObject.removeChild(that.goalMarker);
+            that.goalMarker = null;
         }
     };
     if (withOrientation === false){
@@ -200,6 +218,66 @@ function Navigator(options) {
             sendGoal(pose);
             currentPose[0]=pose;
         });
+    }
+}
+// function define to show the video on the canvas
+function MJPEGCANVAS(options){
+    let that = this;
+    options = options || {};
+    let divID = options.divID;
+    this.width = options.width;
+    this.height = options.height;
+    this.quality = options.quality;
+    this.refreshRate = options.refreshRate || 10;
+    this.interval = options.interval || 30;
+    this.invert = options.invert || false;
+    let overlay = options.overlay;
+
+    // create the canvas to render to
+    this.canvas = document.createElement('canvas');
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
+    this.canvas.style.background = '#aaaaaa';
+    document.getElementById(divID).appendChild(this.canvas);
+    let context = this.canvas.getContext('2d');
+    let drawInterval = Math.max(1 / this.refreshRate * 1000, this.interval);
+
+    socket2.onmessage = function (msg) {
+        //clean the canvas
+        that.canvas.width = that.canvas.width
+        //string to JSON
+        const message = JSON.parse(msg.data)
+        //create a new canvas
+        const can = document.createElement('canvas')
+        can.width = message.width
+        can.height = message.height
+        //get the canvas context
+        const ctx = can.getContext('2d')
+        //get the canvas imageData
+        const imgData = ctx.createImageData(message.width,message.height)
+        const data = imgData.data
+        //decode the Base64 to Unicode
+        const inData = atob(message.data)
+        let j = 0
+        let i = 4
+        while (j<inData.length){
+            //Unicode to number
+            const w1 = inData.charCodeAt(j++)
+            const w2 = inData.charCodeAt(j++)
+            const w3 = inData.charCodeAt(j++)
+            if (!message.is_bigendian) {
+                data[i++] = w1; // red
+                data[i++] = w2; // green
+                data[i++] = w3; // blue
+            } else {
+                data[i++] = (w1 >> 8) + ((w1 & 0xff) << 8);
+                data[i++] = (w2 >> 8) + ((w2 & 0xff) << 8);
+                data[i++] = (w3 >> 8) + ((w3 & 0xff) << 8);
+            }
+            data[i++] = 255; // alpha
+        }
+        ctx.putImageData(imgData,0,0)
+        context.drawImage(can,0,0,that.width,that.height)
     }
 }
 
