@@ -199,9 +199,9 @@ function Navigator(options) {
         let pose = JSON.parse(msg.data)
         updateRobotPosition(pose.position, pose.orientation);
         // judge the location of robot is same with the goal, remove the goal marker if merge
-        if (Math.abs(currentPose[0].position.x-pose.position.x)<0.1
-            &&Math.abs(currentPose[0].position.y-pose.position.y)<0.1
-            &&Math.abs(currentPose[0].orientation.w-pose.orientation.w)<0.02)
+        if (Math.abs(currentPose[0].position.x-pose.position.x)<0.2
+            &&Math.abs(currentPose[0].position.y-pose.position.y)<0.2
+            &&Math.abs(currentPose[0].orientation.w-pose.orientation.w)<0.05)
         {
             that.rootObject.removeChild(that.goalMarker);
             that.goalMarker = null;
@@ -241,43 +241,64 @@ function MJPEGCANVAS(options){
     document.getElementById(divID).appendChild(this.canvas);
     let context = this.canvas.getContext('2d');
     let drawInterval = Math.max(1 / this.refreshRate * 1000, this.interval);
-
+    // to judge whether has a whole Image
+    //create a new canvas
+    const can = document.createElement('canvas')
+    can.width = 320
+    can.height = 240
+    //get the canvas context
+    const ctx = can.getContext('2d')
+    //get the canvas imageData
+    const imgData = ctx.createImageData(can.width,can.height)
+    const data = imgData.data
+    let receiveString = ''
+    let stringLength = 0
     socket2.onmessage = function (msg) {
-        //clean the canvas
-        that.canvas.width = that.canvas.width
-        //string to JSON
-        const message = JSON.parse(msg.data)
-        //create a new canvas
-        const can = document.createElement('canvas')
-        can.width = message.width
-        can.height = message.height
-        //get the canvas context
-        const ctx = can.getContext('2d')
-        //get the canvas imageData
-        const imgData = ctx.createImageData(message.width,message.height)
-        const data = imgData.data
-        //decode the Base64 to Unicode
-        const inData = atob(message.data)
+        // //string to JSON
+        // const message = JSON.parse(msg.data)
+        // //decode the Base64 to Unicode
+        // const inData = atob(message.data)
+        // let j = 0
+        // let i = 0
+        // while (j<inData.length){
+        //     //Unicode to number
+        //     const w1 = inData.charCodeAt(j++)
+        //     const w2 = inData.charCodeAt(j++)
+        //     const w3 = inData.charCodeAt(j++)
+        //     data[i++] = w1; // red
+        //     data[i++] = w2; // green
+        //     data[i++] = w3; // blue
+        //     data[i++] = 255; // alpha
+        //
+        // }
+        // ctx.putImageData(imgData,0,0)
+        // context.drawImage(can,0,0,that.width,that.height)
         let j = 0
-        let i = 4
-        while (j<inData.length){
-            //Unicode to number
-            const w1 = inData.charCodeAt(j++)
-            const w2 = inData.charCodeAt(j++)
-            const w3 = inData.charCodeAt(j++)
-            if (!message.is_bigendian) {
+        let i = 0
+        stringLength+=msg.data.length
+        if (stringLength<can.width*can.height*4){
+            receiveString+=msg.data
+        }else if(stringLength>=can.width*can.height*4){
+            let difference = stringLength-can.width*can.height*4
+            receiveString+=msg.data.slice(0,msg.data.length-difference)
+            //decode the Base64 to Unicode
+            const inData = atob(receiveString)
+            while (j<inData.length){
+                //Unicode to number
+                const w1 = inData.charCodeAt(j++)
+                const w2 = inData.charCodeAt(j++)
+                const w3 = inData.charCodeAt(j++)
                 data[i++] = w1; // red
                 data[i++] = w2; // green
                 data[i++] = w3; // blue
-            } else {
-                data[i++] = (w1 >> 8) + ((w1 & 0xff) << 8);
-                data[i++] = (w2 >> 8) + ((w2 & 0xff) << 8);
-                data[i++] = (w3 >> 8) + ((w3 & 0xff) << 8);
+                data[i++] = 255; // alpha
+
             }
-            data[i++] = 255; // alpha
+            ctx.putImageData(imgData,0,0)
+            context.drawImage(can,0,0,that.width,that.height)
+            stringLength = difference
+            receiveString = msg.data.slice(msg.data.length-difference)
         }
-        ctx.putImageData(imgData,0,0)
-        context.drawImage(can,0,0,that.width,that.height)
     }
 }
 

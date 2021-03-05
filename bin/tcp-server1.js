@@ -79,32 +79,6 @@ function deleteEquipment(id, addr) {
 
 }
 
-// 在列表中找到某个id、addr的设备，结果为数组，可能包含多个socket。
-function findEquipment(id, addr) {
-    let result = []
-    let i
-
-    for (i = 0; i < equipmentArray1.length; i++) {
-        if (equipmentArray1[i].id === id && equipmentArray1[i].addr === addr) {
-            result.push(equipmentArray1[i])
-        }
-    }
-    return result
-}
-
-// 在列表中找到某个id的设备，结果为数组，可能包含多个socket。
-function findEquipmentById(id) {
-    let result = []
-    let i
-
-    for (i = 0; i < equipmentArray1.length; i++) {
-        if (equipmentArray1[i].id === id) {
-            result.push(equipmentArray1[i])
-        }
-    }
-    return result
-}
-
 module.exports = {
     mapData:mapData,
     equipmentArray1: equipmentArray1,

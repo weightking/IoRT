@@ -23,7 +23,7 @@ let videoListener = new ROSLIB.Topic({
     ros: ros,
     name: '/camera/rgb/image_raw',
     messageType: 'sensor_msgs/Image',
-    throttle_rate: 200
+    throttle_rate: 100
 });
 
 //construct the objective for the TCP client
@@ -36,12 +36,16 @@ client.connect(9003, '127.0.0.1', function () {
     client.write('Robot1Video')
     // send data to Tcp server
     videoListener.subscribe(function(message) {
-        client.write(JSON.stringify(
-            message
-        ));
+        // let base64 = Buffer.from(message.data,'base64')
+        // let string = base64.toString('binary')
+        //
+        // client.write(string.toString())
+        // console.log(string.length)
+        // console.log(string.charCodeAt(0),string.charCodeAt(1),string.charCodeAt(2))
+        //client.write(JSON.stringify(message))
+        client.write(message.data)
     });
 });
-
 client.on('close', function () {
     console.log('Connection closed.');
 });

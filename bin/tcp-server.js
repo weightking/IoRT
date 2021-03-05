@@ -6,7 +6,6 @@ const TIMEOUT = 100 * 1000000; // 10秒没接收到数据就断开连接
 //const mongodb = require('./mongodb.js')
 const websocket = require('./websocket.js')
 //const tcpClient = require('./tcp-client.js')
-
 //initial Tcp server
 const server = net.createServer((socket) => {
     //connect
@@ -36,13 +35,14 @@ const server = net.createServer((socket) => {
                 }
             }
             else if (socket.id == "Robot1Video") {
-                if (dataArray.indexOf("}{")==-1){
-                    videoStream+=socket.lastValue
-                    if (videoStream.search("is_bigendian") != -1){
-                        websocket.sendRobotData(socket.id, videoStream)
-                        videoStream=""
-                    }
-                }
+                // if (dataArray.indexOf("}{")==-1){
+                //     videoStream+=socket.lastValue
+                //     if (videoStream.search("is_bigendian") != -1){
+                //         websocket.sendRobotData(socket.id, videoStream)
+                //         videoStream=""
+                //     }
+                // }
+                websocket.sendRobotData(socket.id, socket.lastValue)
             }
             else {
                 //保存所接收到的数据
