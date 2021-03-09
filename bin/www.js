@@ -9,7 +9,6 @@ let debug = require('debug')('myapp:server');
 let http = require('http');
 let websocket = require('./websocket.js');
 let tcpServer = require('./tcp-server.js');
-let tcpServer1 = require('./tcp-server1.js')
 /**
  * Get port from environment and store in Express.
  */

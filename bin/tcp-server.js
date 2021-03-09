@@ -9,42 +9,42 @@ const websocket = require('./websocket.js')
 //initial Tcp server
 const server = net.createServer((socket) => {
     //connect
-    let videoStream = ""
     let addr = socket.remoteAddress + ':' + socket.remotePort
     console.log(addr, " connected.")
     console.log(socket.address().address)
     // receive data from Tcp client and arrange corresponding socket to the connected Tcp client.
     socket.on("data", data => {
-//        let dataArray = data.toString('ascii').split(",")
-//        let dataJson = JSON.parse(data)
-        let dataArray = data.toString('ascii')
-        let str = addr + " receive: " + dataArray
-        socket.lastValue = dataArray
-//        console.log("receive:"+dataArray)
-//		socket.write('0');
         // 接收的第一条数据为设备id
         if (!socket.id) {
             socket.id = data.toString('ascii')
             socket.addr = addr
             addEquipment(socket)
         } else {
-            if (socket.id == "Robot1") {
+            if (socket.id === "Robot1") {
+                socket.lastValue = data.toString('ascii')
                 // will not send the data if occurs Sticky
-                if (dataArray.indexOf("}{")==-1){
+                if (socket.lastValue.indexOf("}{")==-1){
                     websocket.sendRobotData(socket.id, socket.lastValue)
                 }
-            }
-            else if (socket.id == "Robot1Video") {
-                // if (dataArray.indexOf("}{")==-1){
-                //     videoStream+=socket.lastValue
-                //     if (videoStream.search("is_bigendian") != -1){
-                //         websocket.sendRobotData(socket.id, videoStream)
-                //         videoStream=""
-                //     }
-                // }
+            }else if (socket.id === 'Robot1RosTopic'){
+                if (socket.lastValue){
+                    socket.lastValue += data.toString('ascii')
+                }else{
+                    socket.lastValue = data.toString('ascii')
+                }
+                if (socket.lastValue.search(/\[/)!=-1 && socket.lastValue.search(/]/)!=-1){
+                    //send message to browser if the websocket is already connected
+                    websocket.sendRobotData(socket.id, socket.lastValue)
+                    //give the mapGrid value to the global variable defined in websocket module
+                    websocket.foo.mapData = socket.lastValue
+                }
+            } else if (socket.id === "Robot1Video") {
+                socket.lastValue = data
+                //transfer the buffer data to client
                 websocket.sendRobotData(socket.id, socket.lastValue)
             }
             else {
+                socket.lastValue = data.toString('ascii').split(",")
                 //保存所接收到的数据
                 // mongodb.insert({id: socket.id, data: socket.lastValue}, function (err) {
                 //     if (err) {
@@ -58,12 +58,12 @@ const server = net.createServer((socket) => {
                 vrControl('turnOn', 'Sensor1', data, socket);
                 vrControl('turnRight', 'Sensor1', data, socket);
                 vrControl('turnLeft', 'Sensor1', data, socket);
-                vrControl('Sensor1', 'temperature', dataArray[1] + ' ' + '\u2103', socket);
-                vrControl('Sensor1', 'humidity', dataArray[0] + ' ' + '%', socket);
-                vrControl('Sensor2', 'ppm', dataArray[2] + '', socket);
-                vrControl('Sensor2', 'ppmCorrected', dataArray[3] + '', socket);
-                vrControl('Sensor3', 'waterLevel', dataArray[1] + '' + 'mm', socket);
-                vrControl('Sensor3', 'flowRate', dataArray[2] + '' + 'L/min', socket);
+                vrControl('Sensor1', 'temperature', socket.lastValue[1] + ' ' + '\u2103', socket);
+                vrControl('Sensor1', 'humidity', socket.lastValue[0] + ' ' + '%', socket);
+                vrControl('Sensor2', 'ppm', socket.lastValue[2] + '', socket);
+                vrControl('Sensor2', 'ppmCorrected', socket.lastValue[3] + '', socket);
+                vrControl('Sensor3', 'waterLevel', socket.lastValue[1] + '' + 'mm', socket);
+                vrControl('Sensor3', 'flowRate', socket.lastValue[2] + '' + 'L/min', socket);
             }
         }
     })

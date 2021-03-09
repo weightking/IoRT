@@ -1,7 +1,12 @@
 const WebSocket = require('ws');
 const moment = require('moment')
 const wsList = []
-let tcpServer1 = require('./tcp-server1.js');
+//Define the mapData as global variable to make other modules to modify the data
+class Foo {
+  constructor({mapData}={mapData:''}) {
+    this.mapData = mapData
+  }
+}
 
 function deleteWebsocket(ws) {
   let wsIndex;
@@ -46,20 +51,20 @@ function sendData(equipmentId,data) {
 }
 
 function sendRobotData(equipmentId,data) {
-  let msg
-  // 捕捉 JSON序列化时的异常
-  try{
-//    msg = JSON.stringify(data)
-    msg=data
-  }
-  catch(err){
-    return console.log("JSON.stringify err:",err)
-  }
+//   let msg
+//   // 捕捉 JSON序列化时的异常
+//   try{
+// //    msg = JSON.stringify(data)
+//     msg=data
+//   }
+//   catch(err){
+//     return console.log("JSON.stringify err:",err)
+//   }
 
   wsList.forEach((v)=>{
     if(v.equipmentId === equipmentId){
       if(v.ws.readyState === WebSocket.OPEN){
-        v.ws.send(msg)
+        v.ws.send(data)
       }
       else{
         // 将不在连接状态的websocket删除
@@ -84,8 +89,9 @@ function init(server) {
         if(data.equipmentId){
           addWebsocket(data.equipmentId,ws)
         }
+        //Send message to browser once the websocket connection
         if (data.equipmentId == "Robot1RosTopic") {
-          ws.send(tcpServer1.mapData.join(""))
+          ws.send(Foo.mapData)
         }
       } catch (error) {
         console.log('websocket received error:',error)
@@ -106,5 +112,6 @@ function init(server) {
 module.exports = {
   init:init,
   sendData:sendData,
-  sendRobotData:sendRobotData
+  sendRobotData:sendRobotData,
+  foo: Foo
 }

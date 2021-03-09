@@ -9,6 +9,8 @@ let equipmentVideo = equipmentId+"Video"
 const socket = new WebSocket('ws://'+host);
 const socket1 = new WebSocket('ws://'+host);
 const socket2 = new WebSocket('ws://'+host);
+//Specify the received binary data format
+socket2.binaryType = 'arraybuffer'
 
 // construct websocket connection
 socket.onopen=function () {
@@ -253,52 +255,67 @@ function MJPEGCANVAS(options){
     const data = imgData.data
     let receiveString = ''
     let stringLength = 0
+    let i = 0
     socket2.onmessage = function (msg) {
-        // //string to JSON
-        // const message = JSON.parse(msg.data)
-        // //decode the Base64 to Unicode
-        // const inData = atob(message.data)
+        // define the typeArray to read the buffer data
+        let view = new Uint8Array(msg.data)
+        // image fragment data length
+        stringLength+=view.length
+        // input buffer binary data in the canvas
+        if (stringLength<can.width*can.height*3){
+            for (let j=0; j<view.length;j++){
+                data[i++] = view[j]
+                if ((j+1+stringLength-view.length)%3===0) {
+                    data[i++] = 255; // alpha
+                }
+            }
+        }else if(stringLength>=can.width*can.height*3){
+            let difference = stringLength-can.width*can.height*3
+            for (let j=0; j<view.length-difference;j++){
+                data[i++] = view[j]
+                if ((j+1+stringLength-view.length)%3===0) {
+                    data[i++] = 255; // alpha
+                }
+            }
+            i = 0
+            stringLength=difference
+            for (let j=view.length-difference; j<view.length; j++){
+                data[i++] = view[j]
+                if ((j+1)%3===0) {
+                    data[i++] = 255; // alpha
+                }
+            }
+        }
+        ctx.putImageData(imgData,0,0)
+        context.drawImage(can,0,0,that.width,that.height)
+
+        // method 2 to display image
         // let j = 0
         // let i = 0
-        // while (j<inData.length){
-        //     //Unicode to number
-        //     const w1 = inData.charCodeAt(j++)
-        //     const w2 = inData.charCodeAt(j++)
-        //     const w3 = inData.charCodeAt(j++)
-        //     data[i++] = w1; // red
-        //     data[i++] = w2; // green
-        //     data[i++] = w3; // blue
-        //     data[i++] = 255; // alpha
+        // stringLength+=msg.data.length
+        // if (stringLength<can.width*can.height*4){
+        //     receiveString+=msg.data
+        // }else if(stringLength>=can.width*can.height*4){
+        //     let difference = stringLength-can.width*can.height*4
+        //     receiveString+=msg.data.slice(0,msg.data.length-difference)
+        //     //decode the Base64 to Unicode
+        //     const inData = atob(receiveString)
+        //     while (j<inData.length){
+        //         //Unicode to number
+        //         const w1 = inData.charCodeAt(j++)
+        //         const w2 = inData.charCodeAt(j++)
+        //         const w3 = inData.charCodeAt(j++)
+        //         data[i++] = w1; // red
+        //         data[i++] = w2; // green
+        //         data[i++] = w3; // blue
+        //         data[i++] = 255; // alpha
         //
-        // }
-        // ctx.putImageData(imgData,0,0)
-        // context.drawImage(can,0,0,that.width,that.height)
-        let j = 0
-        let i = 0
-        stringLength+=msg.data.length
-        if (stringLength<can.width*can.height*4){
-            receiveString+=msg.data
-        }else if(stringLength>=can.width*can.height*4){
-            let difference = stringLength-can.width*can.height*4
-            receiveString+=msg.data.slice(0,msg.data.length-difference)
-            //decode the Base64 to Unicode
-            const inData = atob(receiveString)
-            while (j<inData.length){
-                //Unicode to number
-                const w1 = inData.charCodeAt(j++)
-                const w2 = inData.charCodeAt(j++)
-                const w3 = inData.charCodeAt(j++)
-                data[i++] = w1; // red
-                data[i++] = w2; // green
-                data[i++] = w3; // blue
-                data[i++] = 255; // alpha
-
-            }
-            ctx.putImageData(imgData,0,0)
-            context.drawImage(can,0,0,that.width,that.height)
-            stringLength = difference
-            receiveString = msg.data.slice(msg.data.length-difference)
-        }
+        //     }
+        //     ctx.putImageData(imgData,0,0)
+        //     context.drawImage(can,0,0,that.width,that.height)
+        //     stringLength = difference
+        //     receiveString = msg.data.slice(msg.data.length-difference)
+        //}
     }
 }
 
