@@ -76,8 +76,8 @@ let poseListener = new ROSLIB.Topic({
 //construct the objective for the TCP client
 let client = new net.Socket();
 //connect to TCP server
-//client.connect(9003, '35.222.89.72', function () {
-client.connect(9003, '127.0.0.1', function () {
+client.connect(9003, '35.222.89.72', function () {
+//client.connect(9003, '127.0.0.1', function () {
     console.log('tcp-client Connected.');
     // send IP address to Tcp server to arrange corresponding socket
     client.write('Robot1')

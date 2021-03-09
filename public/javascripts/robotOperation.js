@@ -277,6 +277,8 @@ function MJPEGCANVAS(options){
                     data[i++] = 255; // alpha
                 }
             }
+            ctx.putImageData(imgData,0,0)
+            context.drawImage(can,0,0,that.width,that.height)
             i = 0
             stringLength=difference
             for (let j=view.length-difference; j<view.length; j++){
@@ -286,8 +288,6 @@ function MJPEGCANVAS(options){
                 }
             }
         }
-        ctx.putImageData(imgData,0,0)
-        context.drawImage(can,0,0,that.width,that.height)
 
         // method 2 to display image
         // let j = 0
