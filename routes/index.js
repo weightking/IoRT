@@ -1,25 +1,24 @@
 var express = require('express');
 var router = express.Router();
 //let mongodb = require('../bin/mongodb');
-let tcpServer = require('../bin/tcp-server.js');
 const moment = require('moment')
 
+router.get('/login',require('./index/loginget'))
+
+router.post('/login',require('./index/loginpost'))
+
+router.get('/operation',require('./index/operation'))
+
+router.get('/logout', require('./index/logout'))
+
 // 显示某设备数据
-router.get('/robotsId/:id', function(req, res, next) {
-  res.render('robotOperation',{ title: 'Robot Operation System',tcpServer:tcpServer});
-});
+router.get('/robotsId/:id', require('./index/robotsId'));
 
-router.get('/temperatureId/:id', function(req, res, next) {
-  res.render('indexTemperature', { title: 'Temperature and Humidity-'+req.params.id });
-});
+router.get('/temperatureId/:id', require('./index/temperatureId'));
 
-router.get('/gasQualityId/:id', function(req, res, next) {
-  res.render('indexGasQuality', { title: 'Gas quality-'+req.params.id });
-});
+router.get('/gasQualityId/:id', require('./index/gasQualityId'));
 
-router.get('/waterSensorId/:id', function(req, res, next) {
-  res.render('indexWaterSensor', { title: 'Water sensors-'+req.params.id });
-});
+router.get('/waterSensorId/:id', require('./index/waterSensorId'));
 
 // 获取某设备的历史数据
 // GET /history/123456 取得设备id为12356的数据。
@@ -44,10 +43,6 @@ router.get('/waterSensorId/:id', function(req, res, next) {
 // });
 
 // send commend to IoT equipment or robot
-router.post('/device/:id',function (req,res,next) {
-  console.log('post /led/:id - ',req.params.id,req.body);
-  tcpServer.sentCommand(req.params.id,req.body.action)
-  res.send({code:0,msg:'命令已发送'})
-})
+router.post('/device/:id',require('./index/deviceIdpost'))
 
 module.exports = router;

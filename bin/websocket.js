@@ -51,16 +51,6 @@ function sendData(equipmentId,data) {
 }
 
 function sendRobotData(equipmentId,data) {
-//   let msg
-//   // 捕捉 JSON序列化时的异常
-//   try{
-// //    msg = JSON.stringify(data)
-//     msg=data
-//   }
-//   catch(err){
-//     return console.log("JSON.stringify err:",err)
-//   }
-
   wsList.forEach((v)=>{
     if(v.equipmentId === equipmentId){
       if(v.ws.readyState === WebSocket.OPEN){
