@@ -1,10 +1,10 @@
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 const {User} = require('../../model/user')
 
 const login = async (req,res)=>{
     const {email,password} = req.body
     if (email.trim(400).length==0 || password.trim(400).length==0){
-        return res.status(400).render('error')
+        return res.status(400).render('error1',{msg:'email or password wrong'})
     }
     let user = await User.findOne({email})
     if (user){
@@ -15,11 +15,11 @@ const login = async (req,res)=>{
             req.app.locals.userInfo = user
             res.redirect('/operation')
         }else {
-            res.status(400).render('admin/error',{msg:'email or password wrong'})
+            res.status(400).render('error1',{msg:'email or password wrong'})
         }
     }else
     {
-        res.status(400).render('admin/error',{msg:'email or password wrong'})
+        res.status(400).render('error1',{msg:'email or password wrong'})
     }
 }
 
